@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="js/jquery.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<style>
+	.bulb-wrap{width:250px;margin:0 auto;}
+	.btn-wrap{width: 100px;margin: 0 auto;}
+	.btn-refresh{width: 100%;padding: 10px;background: #ccc;border: 1px solid #ccc;margin: 15px auto;border-radius:5px;}
+</style>
+ 
+</head>
+<body>
+	<h3 class="text-center">Bulb</h3>
+	<div class="bulb-wrap">
+		<img id=IMG align="middle" height="300" width="250" src="images/offBulb.gif" onclick = "myFunction()"></img>
+		<div class="btn-wrap">
+			<button onclick="currentStat()" type="button" class="btn btn-primary btn-lg " id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Refreshing....">Refresh</button>
+		<!--	<button onclick="currentStat()" class="btn-refresh"><span class="glyphicon glyphicon-refresh"></span> Refresh</button> -->
+		</div>
+	</div>
+<script>
+$('.btn').on('click', function() {
+    var $this = $(this);
+  $this.button('loading');
+    setTimeout(function() {
+       $this.button('reset');
+   }, 2050);
+});
+
+var abc = true;
+currentStat();
+function currentStat(){
+$(document).ready(function(){
+        $.get("/status", function(data, status){
+            //alert("Data: " + data + "\nStatus: " + status);
+			console.log('Physical bulb status:',data);
+			if(data == "ON")
+			{
+				document.getElementById("IMG").innerHTML = image.src = "images/onBulb.gif" ;
+				abc = false
+			}else{
+			
+				document.getElementById("IMG").innerHTML = image.src = "images/offBulb.gif" ;
+				abc = true
+			}
+		});
+});
+}
+
+var image = document.getElementById("IMG");
+   
+function myFunction(){
+
+if(abc && image.src.match("images/offBulb.gif"))
+{ 
+	$.post("/updatedStatus",
+    {
+        access_token: "Bulb On"
+    },
+    function(data, status){
+       // alert("Data: " + data + "\nStatus: " + status);
+    });
+  console.log("Changing the bulb status to ON");
+document.getElementById("IMG").innerHTML = image.src = "images/onBulb.gif" ;
+abc = false;
+}
+else 
+{
+	$.post("/updatedStatus",
+    {
+        access_token: "Bulb Off"
+    },
+    function(data, status){
+       // alert("Data: " + data + "\nStatus: " + status);
+    });
+	console.log("Changing the bulb status to OFF");
+document.getElementById("IMG").innerHTML = image.src = "images/offBulb.gif" ;
+abc = true;
+}
+}
+
+</script>
+
+</body>
+</html>
