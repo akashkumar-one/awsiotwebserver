@@ -25,6 +25,7 @@
 			<button onclick="currentStat()" type="button" class="btn btn-primary btn-lg " id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Refreshing....">Refresh</button>
 		<!--	<button onclick="currentStat()" class="btn-refresh"><span class="glyphicon glyphicon-refresh"></span> Refresh</button> -->
 		</div>
+		<p id=inSync_stat align="middle"></p> 
 	</div>
 <script>
 $('.btn').on('click', function() {
@@ -41,15 +42,26 @@ function currentStat(){
 $(document).ready(function(){
         $.get("/status", function(data, status){
             //alert("Data: " + data + "\nStatus: " + status);
-			console.log('Physical bulb status:',data);
-			if(data == "ON")
+			console.log('Physical bulb status:',data.bulb_state);
+			if(data.bulb_state == "ON")
 			{
 				document.getElementById("IMG").innerHTML = image.src = "images/onBulb.gif" ;
 				abc = false
-			}else{
+			}else if(data.bulb_state == "OFF"){
 			
 				document.getElementById("IMG").innerHTML = image.src = "images/offBulb.gif" ;
 				abc = true
+			}
+			if(data.inSync == true)
+			{
+				console.log("Device is in sync");
+				$('#inSync_stat').css("color","blue");
+				document.getElementById("inSync_stat").innerHTML = "Device is in sync" ;
+			}else if(data.inSync == false){
+			
+				console.log("Device is out of sync :(");
+				$('#inSync_stat').css("color","red");
+				document.getElementById("inSync_stat").innerHTML = "Device is out of sync :(" ;
 			}
 		});
 });

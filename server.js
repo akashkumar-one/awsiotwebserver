@@ -6,6 +6,7 @@ var bodyParser  = require('body-parser');
 var fs = require('fs');
 var path = require('path');
 var bulb_state = 'null';
+var sync = 'null';
 
 app.use(bodyParser.urlencoded({
   extended: true
@@ -14,17 +15,21 @@ app.use(bodyParser.urlencoded({
 app.post('/updatedStatus', function (req, res){
 	var body = req.body.access_token;
 			if(body == "Bulb On"){
-				console.log(body);
+				//console.log(body);
 				device.publish('$aws/things/Bulb/shadow/update', JSON.stringify({"state":{"desired":{"bulb_mode": "ON"}}}));
 			}else if(body == "Bulb Off"){
-				console.log(body);
+				//console.log(body);
 				device.publish('$aws/things/Bulb/shadow/update', JSON.stringify({"state":{"desired":{"bulb_mode": "OFF"}}}));
 			}
-	res.send('ON').end();
+	res.send(sync).end();
 });
 
 app.get('/status', function (req, res){
-	res.send(bulb_state).end();
+	currentStat();
+	setTimeout(function () {
+		res.send({"bulb_state":bulb_state,"inSync":sync}).end();
+	}, 2050)
+	
 });
 app.use(express.static(__dirname + '/public'));
 
@@ -42,7 +47,7 @@ var device = awsIot.device({
 keyPath:	'cer/0a231e80c3-private.pem.key',
 certPath:	'cer/0a231e80c3-certificate.pem.crt',
 caPath:	'cer/Bulb.pem',
-clientId: 'Bulb',
+clientId: 'Bulb_Client',
 region: 'us-east-1',
 host: 'A24YH4R042AAJX.iot.us-east-1.amazonaws.com'
 });
@@ -67,7 +72,16 @@ device
 		
 	}else if(topic == '$aws/things/Bulb/shadow/get/accepted'){
 		bulb_state = payLD.state.reported.bulb_mode;
-		if(bulb_state == "OFF")
+		if(payLD.state.reported.bulb_mode == payLD.state.desired.bulb_mode){
+			console.log("Device is in sync, status is updated successfully!!!");
+			sync = true;
+		}else
+		{
+			console.log("Device out of sync. :( ");
+			sync = false;
+		}
+		//console.log(payLD);
+	if(bulb_state == "OFF")
 	{
 			console.log('Current State of Bulb  is OFF');
 	}else if(bulb_state == "ON"){
