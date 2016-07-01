@@ -42,6 +42,7 @@ app.listen(port, function(){
 
 //var x = path.sep('/cer/0a231e80c3-private.pem.key');
 //console.log(x);
+/*
 
 var device = awsIot.device({
 keyPath:	'cer/0a231e80c3-private.pem.key',
@@ -63,7 +64,6 @@ device
 	function currentStat(){
     device.publish('$aws/things/Bulb/shadow/get', JSON.stringify(""));
 	}
-	
 device
   .on('message', function(topic, payload) {
 	//console.log('\n');
@@ -92,3 +92,4 @@ device
 		console.log('message', topic, payload.toString());
 	}
   });
+  */
